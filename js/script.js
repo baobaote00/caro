@@ -36,7 +36,7 @@ for (let i = 0; i < banCo.length; i++) {
             currentElement.innerHTML = banCo[x][y];
 
             // console.log(checkRow(banCo));
-            console.log(checkCross(banCo));
+            console.log(checkCross(x, y));
         });
         document.querySelector("body").appendChild(child);
     }
@@ -72,19 +72,29 @@ function checkCol(banCo) {
         }
     }
 }
-function checkCross(banCo) {
-    for (let i = 0; i < banCo.length; i++) {
-        let count = 1;
-        for (let j = 0; j < banCo[0].length - 1; j++) {
-            if ((i + j) >= banCo.length) continue;
-            if (!banCo[i + j][i + j]) continue;
-            console.log(i+j);
+function checkCross(locationX, locationY) {
+    const current = banCo[locationX][locationY];
 
-            let check = banCo[i + j][i + j] == banCo[i + j + 1][i + j + 1];
-            count = check ? count + 1 : 0;
+    let point = [locationX, locationY];
 
-            console.log(count);
-            if (count == 5) return count;
+    for (let i = 0; i < 10; i++) {
+        if ((locationX - i) < 0 || (locationX - i) > 10 || (locationY - i) < 0 || (locationY - i) > 10) {
+            break;
+        }
+        if (banCo[locationX - i][locationY - i] != current) {
+            point = [locationX - i + 1, locationY - i + 1]
+            break;
         }
     }
+
+    for (let i = 0; i < 5; i++) {
+        if ((point[0] + i) < 0 || (point[0] + i) >= 10 || (point[1] + i) < 0 || (point[1] + i) >= 10) {
+            return false
+        }
+        if (banCo[(point[0]+i)*1][(point[1]+i)*1] != current) {
+            return false
+        }
+    }
+
+    return true;
 }
