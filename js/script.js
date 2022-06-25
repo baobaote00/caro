@@ -1,33 +1,36 @@
-const banCo = new Array(
-    new Array(10),
-    new Array(10),
-    new Array(10),
-    new Array(10),
-    new Array(10),
-    new Array(10),
-    new Array(10),
-    new Array(10),
-    new Array(10),
-    new Array(10),
-);
+let banCo = [];
+let length = 20;
+
+for (let i = 0; i < length; i++) {
+    banCo.push(new Array(length));    
+}
+
+const heightWindow = window.innerHeight;
+const wrap = document.querySelector('div.wrap');
+
+wrap.style.height = (heightWindow * 0.95) + 'px';
+wrap.style.width = (heightWindow * 0.95) + 'px';
 
 let current = true;
-
 for (let i = 0; i < banCo.length; i++) {
     const e = banCo[i];
     for (let j = 0; j < e.length; j++) {
         let e1 = e[j];
         const child = document.createElement("div");
         child.classList.add("box");
-        child.setAttribute("location-x", `${i}`)
-        child.setAttribute("location-y", `${j}`)
+        child.setAttribute("location-x", `${i}`);
+        child.setAttribute("location-y", `${j}`);
+
+        child.style.width = `calc(${100/length}% - 2px)`;
+        child.style.height = `calc(${100/length}% - 2px)`;
+
         child.addEventListener('click', e => {
             const currentElement = e.currentTarget;
             if (currentElement.innerHTML) return;
 
             const x = currentElement.getAttribute("location-x");
             const y = currentElement.getAttribute("location-y");
-            banCo[x][y] = current ? "X" : "Y";
+            banCo[x][y] = current ? "X" : "O";
             current = !current;
 
             e1 = banCo[x][y];
@@ -35,15 +38,19 @@ for (let i = 0; i < banCo.length; i++) {
             currentElement.classList.add(banCo[x][y]);
             currentElement.innerHTML = banCo[x][y];
 
-            // console.log(checkRow(banCo));
-            console.log(checkCross(x, y));
+            if (checkWin(banCo, x, y)) {
+                alert(checkWin(banCo, x, y));
+            }
         });
-        document.querySelector("body").appendChild(child);
+        wrap.appendChild(child);
     }
 }
 
-function checkWin(banCo) {
-
+function checkWin(banCo, x, y) {
+    return checkRow(banCo) ||
+        checkCol(banCo) ||
+        checkCrossDown(x, y) ||
+        checkCrossUp(x, y);
 }
 
 function checkRow(banCo) {
@@ -55,7 +62,7 @@ function checkRow(banCo) {
             let check = banCo[i][j] == banCo[i][j + 1];
             count = check ? count + 1 : 0;
 
-            if (count == 5) return count;
+            if (count == 5) return true;
         }
     }
 }
@@ -68,33 +75,48 @@ function checkCol(banCo) {
             let check = banCo[j][i] == banCo[j + 1][i];
             count = check ? count + 1 : 0;
 
-            if (count == 5) return count;
+            if (count == 5) return true;
         }
     }
 }
-function checkCross(locationX, locationY) {
+function checkCrossDown(locationX, locationY) {
     const current = banCo[locationX][locationY];
 
-    let point = [locationX, locationY];
-
-    for (let i = 0; i < 10; i++) {
-        if ((locationX - i) < 0 || (locationX - i) > 10 || (locationY - i) < 0 || (locationY - i) > 10) {
-            break;
-        }
-        if (banCo[locationX - i][locationY - i] != current) {
-            point = [locationX - i + 1, locationY - i + 1]
-            break;
-        }
-    }
-
-    for (let i = 0; i < 5; i++) {
-        if ((point[0] + i) < 0 || (point[0] + i) >= 10 || (point[1] + i) < 0 || (point[1] + i) >= 10) {
-            return false
-        }
-        if (banCo[(point[0]+i)*1][(point[1]+i)*1] != current) {
-            return false
+    let count = 0;
+    for (let i = -4; i <= 4; i++) {
+        if ((locationX * 1 + i) >= 0 && (locationY * 1 + i) >= 0 && (locationX * 1 + i) < banCo.length && (locationY * 1 + i) < banCo.length) {
+            if (banCo[locationX * 1 + i][locationY * 1 + i] == current) {
+                count++;
+                console.log(count);
+                if (count == 5) {
+                    break;
+                }
+            } else {
+                count = 0;
+            }
         }
     }
 
-    return true;
+    return count == 5;
+}
+
+function checkCrossUp(locationX, locationY) {
+    const current = banCo[locationX][locationY];
+
+    let count = 0;
+    for (let i = -4; i <= 4; i++) {
+        if ((locationX * 1 + i) >= 0 && (locationY * 1 - i) >= 0 && (locationX * 1 + i) < banCo.length && (locationY * 1 - i) < banCo.length) {
+            if (banCo[locationX * 1 + i][locationY * 1 - i] == current) {
+                count++;
+                console.log(count);
+                if (count == 5) {
+                    break;
+                }
+            } else {
+                count = 0;
+            }
+        }
+    }
+
+    return count == 5;
 }

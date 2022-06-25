@@ -1,29 +1,28 @@
 body {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: 0;
-    padding: 0;
+    background-color: #000;
+}
+
+.wrap {
+    position: fixed;
+    top: 2.5%;
+    left: 2.5%;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
 }
 
-.box{
-    width: calc(10% - 2px);
-    height: calc(10% - 2px);
+.box {
     display: flex;
-    border: 1px solid #000;
+    border: 1px solid #fff;
     justify-content: center;
     align-items: center;
 }
 
 .X {
-    background-color: #ee99ee;
+    background-color: cyan;
 }
-.Y {
-    background-color: #ee00ee;
+
+.O {
+    background-color: pink;
 }
