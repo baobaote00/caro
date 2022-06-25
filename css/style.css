@@ -2,6 +2,10 @@ body {
     background-color: #000;
 }
 
+*{
+    box-sizing: unset;
+}
+
 .wrap {
     position: fixed;
     top: 2.5%;
@@ -20,9 +24,70 @@ body {
 }
 
 .X {
-    background-color: cyan;
+    background-color: #00ffff;
 }
 
 .O {
-    background-color: pink;
+    background-color: #ffc0cb;
+}
+
+.O-hover {
+    background-color: #ffc0cb60;
+}
+.X-hover{
+    background-color: #00ffff60
+}
+
+.function{
+    position:absolute;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    background-color: transparent;
+}
+
+.float-right{
+    display: none;
+    flex-direction: column;
+}
+
+.icon{
+    position:absolute;
+    transform: translateX(-150%);
+    background-color: aquamarine;
+}
+
+.dropdown-item{
+    width:75%;
+}
+
+.function:hover .float-right{
+    display:flex;
+    padding: 10px;
+}
+
+.function:hover .icon{
+    display:none;
+}
+
+.flip{
+    animation: 2s ease-in-out flip;
+}
+
+@keyframes flip {
+    0% {
+        transform: rotateY(0deg);
+    }
+    100% {
+        transform: rotateY(360deg);
+    }
+}
+
+@keyframes test {
+    0% {
+        transform: scaleX(0%);
+    }
+    100% {
+        transform: scaleX(100%);
+    }
 }

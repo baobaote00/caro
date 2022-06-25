@@ -1,48 +1,107 @@
-let banCo = [];
-let length = 20;
+const wrap = document.querySelector('div.wrap');
+const items = document.querySelectorAll('.dropdown-item');
+const choiLai = document.querySelector('#choi-lai');
+const diLai = document.querySelector('#di-lai');
 
-for (let i = 0; i < length; i++) {
-    banCo.push(new Array(length));    
+let length = 20;
+let iconX = '<i class="fa-solid fa-1"></i>';
+let iconO = '<i class="fa-solid fa-0"></i>';
+let current = true;
+let currentRotate = 0;
+let banCo = createBanCo(length);
+let diLui = [];
+
+createWrapper(current, currentRotate, banCo)
+
+diLai.addEventListener('click', (e) => {
+    if (diLui.length <= 0) return;
+    banCo[diLui[0]][diLui[1]] = null;
+    document.querySelector(`[location-x="${diLui[0]}"][location-y="${diLui[1]}"]`).innerHTML = null;
+});
+
+function createBanCo(length) {
+    let banCo = [];
+
+    for (let i = 0; i < length; i++) {
+        banCo.push(new Array(length));
+    }
+
+    return banCo;
 }
 
-const heightWindow = window.innerHeight;
-const wrap = document.querySelector('div.wrap');
+choiLai.addEventListener('click', () => {
+    createWrapper(current, currentRotate, banCo);
+});
 
-wrap.style.height = (heightWindow * 0.95) + 'px';
-wrap.style.width = (heightWindow * 0.95) + 'px';
+items.forEach((item) => {
+    item.addEventListener('click', (e) => {
+        const currentElement = e.currentTarget;
 
-let current = true;
-for (let i = 0; i < banCo.length; i++) {
-    const e = banCo[i];
-    for (let j = 0; j < e.length; j++) {
-        let e1 = e[j];
-        const child = document.createElement("div");
-        child.classList.add("box");
-        child.setAttribute("location-x", `${i}`);
-        child.setAttribute("location-y", `${j}`);
+        length = currentElement.getAttribute('length');
+        banCo = createBanCo(length * 1);
 
-        child.style.width = `calc(${100/length}% - 2px)`;
-        child.style.height = `calc(${100/length}% - 2px)`;
+        createWrapper(current, currentRotate, banCo)
+    });
+})
 
-        child.addEventListener('click', e => {
-            const currentElement = e.currentTarget;
-            if (currentElement.innerHTML) return;
+function createWrapper(current, currentRotate, banCoNew) {
+    const heightWindow = window.innerHeight;
+    wrap.style.height = (heightWindow * 0.95) + 'px';
+    wrap.style.width = (heightWindow * 0.95) + 'px';
+    wrap.innerHTML = '';
 
-            const x = currentElement.getAttribute("location-x");
-            const y = currentElement.getAttribute("location-y");
-            banCo[x][y] = current ? "X" : "O";
-            current = !current;
+    for (let i = 0; i < banCoNew.length; i++) {
+        const e = banCoNew[i];
+        for (let j = 0; j < e.length; j++) {
+            const child = document.createElement("div");
 
-            e1 = banCo[x][y];
+            child.classList.add("box");
+            child.setAttribute("location-x", `${i}`);
+            child.setAttribute("location-y", `${j}`);
 
-            currentElement.classList.add(banCo[x][y]);
-            currentElement.innerHTML = banCo[x][y];
+            child.style.width = `calc(${100 / length}% - 2px)`;
+            child.style.height = `calc(${100 / length}% - 2px)`;
 
-            if (checkWin(banCo, x, y)) {
-                alert(checkWin(banCo, x, y));
+            child.addEventListener('click', e => {
+                const currentElement = e.currentTarget;
+                if (currentElement.innerHTML) return;
+
+                const x = currentElement.getAttribute("location-x");
+                const y = currentElement.getAttribute("location-y");
+                banCoNew[x][y] = current ? "X" : "O";
+                current = !current;
+
+                diLui = [x, y];
+
+                currentElement.classList.toggle("flip");
+
+                wrap.style.transform = 'rotate(' + currentRotate + 'deg)';
+                currentRotate += 90;
+
+                currentElement.classList.add(banCoNew[x][y]);
+                currentElement.classList.remove(banCoNew[x][y] == "X" ? "X-hover" : "O-hover");
+                currentElement.innerHTML = banCoNew[x][y] == "X" ? iconX : iconO;
+
+                if (checkWin(banCoNew, x, y)) {
+                    $('#exampleModal').modal('toggle')
+                    $('#exampleModal').find('#exampleModalLabel').html(`${banCoNew[x][y] == "X" ? iconX : iconO} Win`);
+                    wrap.innerHTML = wrap.innerHTML;
+                }
+            });
+
+            const hover = e => {
+                const currentElement = e.currentTarget;
+                if (currentElement.innerHTML) return;
+
+                currentElement.classList.toggle(current ? "X-hover" : "O-hover");
             }
-        });
-        wrap.appendChild(child);
+
+            child.addEventListener('mouseover', hover);
+
+            child.addEventListener("mouseout", hover)
+
+            wrap.appendChild(child);
+        }
     }
 }
 
@@ -66,6 +125,7 @@ function checkRow(banCo) {
         }
     }
 }
+
 function checkCol(banCo) {
     for (let i = 0; i < banCo.length; i++) {
         let count = 1;
@@ -79,6 +139,7 @@ function checkCol(banCo) {
         }
     }
 }
+
 function checkCrossDown(locationX, locationY) {
     const current = banCo[locationX][locationY];
 
@@ -87,10 +148,7 @@ function checkCrossDown(locationX, locationY) {
         if ((locationX * 1 + i) >= 0 && (locationY * 1 + i) >= 0 && (locationX * 1 + i) < banCo.length && (locationY * 1 + i) < banCo.length) {
             if (banCo[locationX * 1 + i][locationY * 1 + i] == current) {
                 count++;
-                console.log(count);
-                if (count == 5) {
-                    break;
-                }
+                if (count == 5) break;
             } else {
                 count = 0;
             }
@@ -108,10 +166,7 @@ function checkCrossUp(locationX, locationY) {
         if ((locationX * 1 + i) >= 0 && (locationY * 1 - i) >= 0 && (locationX * 1 + i) < banCo.length && (locationY * 1 - i) < banCo.length) {
             if (banCo[locationX * 1 + i][locationY * 1 - i] == current) {
                 count++;
-                console.log(count);
-                if (count == 5) {
-                    break;
-                }
+                if (count == 5) break;
             } else {
                 count = 0;
             }
