@@ -16,7 +16,7 @@ let current = true;
 for (let i = 0; i < banCo.length; i++) {
     const e = banCo[i];
     for (let j = 0; j < e.length; j++) {
-        const e1 = e[j];
+        let e1 = e[j];
         const child = document.createElement("div");
         child.classList.add("box");
         child.setAttribute("location-x", `${i}`)
@@ -30,9 +30,61 @@ for (let i = 0; i < banCo.length; i++) {
             banCo[x][y] = current ? "X" : "Y";
             current = !current;
 
+            e1 = banCo[x][y];
+
             currentElement.classList.add(banCo[x][y]);
             currentElement.innerHTML = banCo[x][y];
+
+            // console.log(checkRow(banCo));
+            console.log(checkCross(banCo));
         });
         document.querySelector("body").appendChild(child);
+    }
+}
+
+function checkWin(banCo) {
+
+}
+
+function checkRow(banCo) {
+    for (let i = 0; i < banCo.length; i++) {
+        let count = 1;
+        for (let j = 0; j < banCo[i].length - 1; j++) {
+            if (!banCo[i][j]) continue;
+
+            let check = banCo[i][j] == banCo[i][j + 1];
+            count = check ? count + 1 : 0;
+
+            if (count == 5) return count;
+        }
+    }
+}
+function checkCol(banCo) {
+    for (let i = 0; i < banCo.length; i++) {
+        let count = 1;
+        for (let j = 0; j < banCo[0].length - 1; j++) {
+            if (!banCo[j][i]) continue;
+
+            let check = banCo[j][i] == banCo[j + 1][i];
+            count = check ? count + 1 : 0;
+
+            if (count == 5) return count;
+        }
+    }
+}
+function checkCross(banCo) {
+    for (let i = 0; i < banCo.length; i++) {
+        let count = 1;
+        for (let j = 0; j < banCo[0].length - 1; j++) {
+            if ((i + j) >= banCo.length) continue;
+            if (!banCo[i + j][i + j]) continue;
+            console.log(i+j);
+
+            let check = banCo[i + j][i + j] == banCo[i + j + 1][i + j + 1];
+            count = check ? count + 1 : 0;
+
+            console.log(count);
+            if (count == 5) return count;
+        }
     }
 }
