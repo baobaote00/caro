@@ -16,23 +16,25 @@
 
 <body>
     <div class="wrap"></div>
-
+    <div class="clock-btn">
+        <div id="MyClockDisplay" class="clock X-font" onload="showTime()"></div>
+        <button class="bubbly-button my-btn" id="choi-lai">Start</button>
+    </div>
     <div class="function">
         <button class="icon"><i class="fa-solid fa-bars"></i></button>
         <div class="float-right">
             <div class="btn-group dropleft mb-2">
-                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                <button type="button" class="btn btn-outline-secondary ab dropdown-toggle" id="dropdown" data-toggle="dropdown"
                     aria-haspopup="true" aria-expanded="false">
                     tỷ lệ bàn cờ
                 </button>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu ">
                     <button class="dropdown-item" length="10">10x10</button>
                     <button class="dropdown-item" length="20">20x20</button>
                     <button class="dropdown-item" length="30">30x30</button>
                 </div>
             </div>
-            <button type="button" class="btn btn-outline-secondary" id="choi-lai">Chơi lại</button>
-            <button type="button" class="btn btn-outline-secondary" id="di-lai">Đi lại</button>
+            <button type="button" class="btn btn-outline-secondary ab" id="di-lai">Đi lại</button>
         </div>
     </div>
 

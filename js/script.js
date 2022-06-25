@@ -2,21 +2,61 @@ const wrap = document.querySelector('div.wrap');
 const items = document.querySelectorAll('.dropdown-item');
 const choiLai = document.querySelector('#choi-lai');
 const diLai = document.querySelector('#di-lai');
-
+const clockDisplay = document.getElementById("MyClockDisplay");
+let spin = [90, 135, 180, 225, 270, 315];
+let deg = 45;
 let length = 20;
-let iconX = '<i class="fa-solid fa-1"></i>';
-let iconO = '<i class="fa-solid fa-0"></i>';
+let iconX = '<i class="fa-solid fa-x"></i>';
+let iconO = '<i class="fa-solid fa-o"></i>';
 let current = true;
-let currentRotate = 0;
 let banCo = createBanCo(length);
 let diLui = [];
+const changeTime = 30000;
+let currentTime = changeTime;
+let isWin = false;
+let inter;
+let isStart = true;
 
-createWrapper(current, currentRotate, banCo)
+function interTime() {
+    if (!isWin) {
+        if (currentTime == 0) {
+            currentTime = changeTime;
+            current = !current;
+
+        }
+
+        const font = current ? "X-font" : "O-font";
+        const fontRemove = !current ? "X-font" : "O-font"
+        clockDisplay.classList.remove(fontRemove);
+        clockDisplay.classList.add(font);
+        let time = ((currentTime * 1) / 1000) + "s";
+        clockDisplay.innerText = time;
+        clockDisplay.textContent = time;
+        currentTime = currentTime * 1 - 1000;
+    } else {
+        const whoWin = !current ? "X Win" : "O Win";
+        const font = !current ? "X-font" : "O-font";
+        const fontRemove = current ? "X-font" : "O-font"
+        clockDisplay.classList.remove(fontRemove);
+        clockDisplay.classList.add(font);
+        clockDisplay.innerText = whoWin;
+        clockDisplay.textContent = whoWin;
+        clearInterval(inter);
+        isWin = false;
+    }
+
+}
 
 diLai.addEventListener('click', (e) => {
     if (diLui.length <= 0) return;
     banCo[diLui[0]][diLui[1]] = null;
-    document.querySelector(`[location-x="${diLui[0]}"][location-y="${diLui[1]}"]`).innerHTML = null;
+    const cur = document.querySelector(`[location-x="${diLui[0]}"][location-y="${diLui[1]}"]`);
+    const _class = current ? "O" : "X";
+    cur.classList.add(_class);
+    current = !current;
+    cur.innerHTML = null;
+    diLui = [];
+    currentTime = changeTime;
 });
 
 function createBanCo(length) {
@@ -30,7 +70,25 @@ function createBanCo(length) {
 }
 
 choiLai.addEventListener('click', () => {
-    createWrapper(current, currentRotate, banCo);
+    const contentBtn = choiLai.innerHTML;
+    switch (contentBtn) {
+        case 'Start':
+            banCo = createBanCo(length * 1);
+            createWrapper(banCo);
+            clearInterval(inter);
+            currentTime = changeTime;
+            inter = setInterval(interTime, 1000);
+            choiLai.innerHTML = 'Stop';
+            break;
+        case 'Stop':
+            clearInterval(inter);
+            wrap.innerHTML = wrap.innerHTML;
+            choiLai.innerHTML = 'Start';
+            break;
+    }
+    diLui = [];
+    current = true;
+    currentTime = changeTime;
 });
 
 items.forEach((item) => {
@@ -40,14 +98,14 @@ items.forEach((item) => {
         length = currentElement.getAttribute('length');
         banCo = createBanCo(length * 1);
 
-        createWrapper(current, currentRotate, banCo)
+        createWrapper(banCo)
     });
 })
 
-function createWrapper(current, currentRotate, banCoNew) {
+function createWrapper(banCoNew) {
     const heightWindow = window.innerHeight;
-    wrap.style.height = (heightWindow * 0.95) + 'px';
-    wrap.style.width = (heightWindow * 0.95) + 'px';
+    wrap.style.height = (heightWindow * 0.68) + 'px';
+    wrap.style.width = (heightWindow * 0.68) + 'px';
     wrap.innerHTML = '';
 
     for (let i = 0; i < banCoNew.length; i++) {
@@ -69,14 +127,20 @@ function createWrapper(current, currentRotate, banCoNew) {
                 const x = currentElement.getAttribute("location-x");
                 const y = currentElement.getAttribute("location-y");
                 banCoNew[x][y] = current ? "X" : "O";
-                current = !current;
-
+                const fontRemove = !current ? "O-font" : "X-font"
+                const font = current ? "O-font" : "X-font"
+                clockDisplay.classList.remove(fontRemove);
+                clockDisplay.classList.add(font);
                 diLui = [x, y];
 
                 currentElement.classList.toggle("flip");
-
-                wrap.style.transform = 'rotate(' + currentRotate + 'deg)';
-                currentRotate += 90;
+                let rotateDeg = spin[Math.floor(Math.random() * (spin.length - 1) + 1)];
+                var carIndex = spin.indexOf(rotateDeg);
+                wrap.style.transform = 'rotate(' + rotateDeg + 'deg)';
+                spin.splice(carIndex, 1);
+                spin.push(deg);
+                deg = rotateDeg;
+                currentTime = changeTime;
 
                 currentElement.classList.add(banCoNew[x][y]);
                 currentElement.classList.remove(banCoNew[x][y] == "X" ? "X-hover" : "O-hover");
@@ -86,7 +150,11 @@ function createWrapper(current, currentRotate, banCoNew) {
                     $('#exampleModal').modal('toggle')
                     $('#exampleModal').find('#exampleModalLabel').html(`${banCoNew[x][y] == "X" ? iconX : iconO} Win`);
                     wrap.innerHTML = wrap.innerHTML;
+                    choiLai.innerHTML = 'Start';
                 }
+                isWin = checkWin(banCoNew, x, y);
+                current = !current;
+
             });
 
             const hover = e => {
@@ -175,3 +243,29 @@ function checkCrossUp(locationX, locationY) {
 
     return count == 5;
 }
+
+var animateButton = function (e) {
+
+    e.preventDefault;
+    //reset animation
+    e.target.classList.remove('animate');
+
+    e.target.classList.add('animate');
+    setTimeout(function () {
+        e.target.classList.remove('animate');
+    }, 700);
+};
+
+var bubblyButtons = document.getElementsByClassName("bubbly-button");
+
+for (var i = 0; i < bubblyButtons.length; i++) {
+    bubblyButtons[i].addEventListener('click', animateButton, false);
+}
+
+document.querySelector('.dropleft').addEventListener('mouseover',(e)=>{
+    $('.dropdown-toggle').dropdown('toggle')
+})
+
+document.querySelector('.dropleft').addEventListener('mouseout',(e)=>{
+    $('.dropdown-toggle').dropdown('toggle')
+})
